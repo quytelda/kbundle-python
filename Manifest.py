@@ -50,13 +50,11 @@ class Manifest:
         if not os.path.isdir(dir_path):
             os.mkdir(dir_path)
 
-        manifestFile = open(self.path, "w")
-
         doc = self.to_xml()
         output = doc.toprettyxml(indent=' ')
-        manifestFile.write(output)
 
-        manifestFile.close()
+        with open(self.path, "w") as manifestFile:
+            manifestFile.write(output)
 
     def insert_entry(self, entry):
         path = entry["full-path"]
@@ -131,8 +129,8 @@ class Manifest:
 
         entry = {
             "media-type" : e.getAttribute(ATTR_MEDIA_TYPE),
-            "full-path"  : e.getAttribute(ATTR_FULL_PATH),
-            "md5sum"     : e.getAttribute(ATTR_MD5SUM),
+            "full-path"  : e.getAttribute(ATTR_FULL_PATH ),
+            "md5sum"     : e.getAttribute(ATTR_MD5SUM    ),
             "tags"       : self.__tags_from_xml(e)
         }
 
