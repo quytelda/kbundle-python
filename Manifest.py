@@ -69,8 +69,8 @@ class Manifest:
     def remove_entry(self):
         pass
 
-    def has_entry(self):
-        pass
+    def has_entry(self, path):
+        return path in self.entries
 
     def add_tag(self):
         pass
