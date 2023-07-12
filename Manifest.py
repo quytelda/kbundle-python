@@ -75,11 +75,25 @@ class Manifest:
     def has_entry(self, path):
         return path in self.entries
 
-    def add_tag(self):
-        pass
+    def add_tag(self, path, tag):
+        if not self.has_entry(path):
+            return False
 
-    def remove_tag(self):
-        pass
+        if tag in self.entries[path]["tags"]:
+            return False
+
+        self.entries[path]["tags"].append(tag)
+        return True
+
+    def remove_tag(self, path, tag):
+        if not self.has_entry(path):
+            return False
+
+        if tag not in self.entries[path]["tags"]:
+            return False
+
+        self.entries[path]["tags"].remove(tag)
+        return True
 
     def to_xml(self):
         doc = MD.getDOMImplementation().createDocument(MANIFEST_XMLNS, TAG_MANIFEST, None)
