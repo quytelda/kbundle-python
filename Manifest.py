@@ -1,10 +1,13 @@
+import pathlib
+
 class Manifest:
 
-    def __init__(self):
-        pass
+    def __init__(self, manifestPath):
+        self.path = manifestPath
+        self.entries = {}
 
     def exists(self):
-        pass
+        return pathlib.Path(self.path).is_file()
 
     def load(self):
         pass
