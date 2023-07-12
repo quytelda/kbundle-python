@@ -1,4 +1,5 @@
 import pathlib
+import xml.dom.minidom as MD
 
 class Manifest:
 
@@ -37,10 +38,26 @@ class Manifest:
         pass
 
     def __tags_from_xml(self, e):
-        pass
+        tags = []
+        for tags_elem in e.getElementsByTagName("manifest:tags"):
+            for tag_elem in tags_elem.getElementsByTagName("manifest:tag"):
+                tags.append(tag_elem.firstChild.data)
+
+        return tags
 
     def __entry_from_xml(self, e):
-        pass
+        if e.tagName != "manifest:file-entry":
+            print("Invalid file entry.")
+            return None
+
+        entry = {
+            "media-type" : e.getAttribute("manifest:media-type"),
+            "full-path"  : e.getAttribute("manifest:full-path"),
+            "md5sum"     : e.getAttribute("manifest:md5sum"),
+            "tags"       : self.__tags_from_xml(e)
+        }
+
+        return entry
 
     def __tags_to_xml(self):
         pass
