@@ -44,6 +44,12 @@ class Manifest:
         return True
 
     def save(self):
+        # If the "META-INF" directory doesn't exists, create it.
+        # The manifest file is created when written.
+        (dir_path, _) = os.path.split(self.path)
+        if not os.path.isdir(dir_path):
+            os.mkdir(dir_path)
+
         manifestFile = open(self.path, "w")
 
         doc = self.to_xml()
