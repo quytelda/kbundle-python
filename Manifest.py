@@ -30,8 +30,8 @@ class Manifest:
         if root.tagName != TAG_MANIFEST or root.getAttribute(ATTR_VERSION) != "1.2":
             return False;
 
-        for elem in doc.getElementsByTagName(TAG_FILE_ENTRY):
-            entry = self.__entry_from_xml(elem)
+        for e in doc.getElementsByTagName(TAG_FILE_ENTRY):
+            entry = self.__entry_from_xml(e)
             if entry is None:
                 return False
 
@@ -85,6 +85,7 @@ class Manifest:
         root.setAttribute("xmlns:manifest", MANIFEST_XMLNS)
         root.setAttribute(ATTR_VERSION, "1.2")
 
+        # A file-entry for the bundle's root directory is always included.
         dir_entry = doc.createElement(TAG_FILE_ENTRY)
         dir_entry.setAttribute(ATTR_MEDIA_TYPE, "application/x-krita-resourcebundle")
         dir_entry.setAttribute(ATTR_FULL_PATH , "/")
@@ -109,7 +110,6 @@ class Manifest:
 
     def __entry_from_xml(self, e):
         if e.tagName != TAG_FILE_ENTRY:
-            print("Invalid file entry.")
             return None
 
         entry = {
