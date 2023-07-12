@@ -60,14 +60,17 @@ class Manifest:
 
     def insert_entry(self, entry):
         path = entry["full-path"]
-
         if path in self.entries:
             entry["tags"] += self.entries[path]["tags"]
 
         self.entries[path] = entry
 
-    def remove_entry(self):
-        pass
+    def remove_entry(self, path):
+        if path not in self.entries:
+            return False
+
+        del self.entries[path]
+        return True
 
     def has_entry(self, path):
         return path in self.entries
