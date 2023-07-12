@@ -12,35 +12,35 @@ class Manifest:
     def save(self):
         pass
 
-    def insertEntry(self):
+    def insert_entry(self, entry):
         pass
 
-    def removeEntry(self):
+    def remove_entry(self):
         pass
 
-    def hasEntry(self):
+    def has_entry(self):
         pass
 
-    def addTag(self):
+    def add_tag(self):
         pass
 
-    def removeTag(self):
+    def remove_tag(self):
         pass
 
-    def toXML(self):
+    def to_xml(self):
         pass
 
-    def resourceList(self):
+    def resource_list(self):
         pass
 
-    def __tagListFromXML(self):
+    def __tags_from_xml(self, e):
         pass
 
-    def __fileEntryFromXML(self):
+    def __entry_from_xml(self, e):
         pass
 
-    def __tagListToXML(self):
+    def __tags_to_xml(self):
         pass
 
-    def __fileEntryToXML(self):
+    def __entry_to_xml(self):
         pass
