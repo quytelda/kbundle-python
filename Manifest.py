@@ -11,13 +11,27 @@ class Manifest:
         return pathlib.Path(self.path).is_file()
 
     def load(self):
-        pass
+        doc = MD.parse(self.path)
+
+        root = doc.documentElement
+        if root.tagName != "manifest:manifest" or root.getAttribute("manifest:version") != "1.2":
+            return False;
+
+        for elem in doc.getElementsByTagName("manifest:file-entry"):
+            entry = self.__entry_from_xml(elem)
+            if entry:
+                self.insert_entry(entry)
 
     def save(self):
         pass
 
     def insert_entry(self, entry):
-        pass
+        path = entry["full-path"]
+
+        if path in self.entries:
+            entry["tags"] += self.entries[path]["tags"]
+
+        self.entries[path] = entry
 
     def remove_entry(self):
         pass
