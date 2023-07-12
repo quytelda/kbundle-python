@@ -42,7 +42,13 @@ class Manifest:
             self.insert_entry(entry)
 
     def save(self):
-        pass
+        manifestFile = open(self.path, "w")
+
+        doc = self.to_xml()
+        output = doc.toprettyxml(indent=' ')
+        manifestFile.write(output)
+
+        manifestFile.close()
 
     def insert_entry(self, entry):
         path = entry["full-path"]
@@ -65,7 +71,22 @@ class Manifest:
         pass
 
     def to_xml(self):
-        pass
+        doc = MD.getDOMImplementation().createDocument(MANIFEST_XMLNS, TAG_MANIFEST, None)
+
+        root = doc.documentElement
+        root.setAttribute("xmlns:manifest", MANIFEST_XMLNS)
+        root.setAttribute(ATTR_VERSION, "1.2")
+
+        dir_entry = doc.createElement(TAG_FILE_ENTRY)
+        dir_entry.setAttribute(ATTR_MEDIA_TYPE, "application/x-krita-resourcebundle")
+        dir_entry.setAttribute(ATTR_FULL_PATH , "/")
+        root.appendChild(dir_entry)
+
+        for entry in self.entries.values():
+            entry_elem = self.__entry_to_xml(doc, entry)
+            root.appendChild(entry_elem)
+
+        return doc
 
     def resource_list(self):
         pass
@@ -92,8 +113,27 @@ class Manifest:
 
         return entry
 
-    def __tags_to_xml(self):
-        pass
+    def __tags_to_xml(self, doc, tags):
+        tags_elem = doc.createElement(TAG_TAGS)
 
-    def __entry_to_xml(self):
-        pass
+        for tag in tags:
+            tag_text = doc.createTextNode(tag)
+            tag_elem = doc.createElement(TAG_TAG)
+
+            tag_elem.appendChild(tag_text)
+            tags_elem.appendChild(tag_elem)
+
+        return tags_elem
+
+    def __entry_to_xml(self, doc, entry):
+        entry_elem = doc.createElement(TAG_FILE_ENTRY)
+
+        entry_elem.setAttribute(ATTR_MEDIA_TYPE, entry["media-type"])
+        entry_elem.setAttribute(ATTR_FULL_PATH , entry["full-path"] )
+        entry_elem.setAttribute(ATTR_MD5SUM    , entry["md5sum"]    )
+
+        if entry["tags"]:
+            tags_elem = self.__tags_to_xml(doc, entry["tags"])
+            entry_elem.appendChild(tags_elem)
+
+        return entry_elem
