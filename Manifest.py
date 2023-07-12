@@ -19,8 +19,14 @@ class Manifest:
 
         for elem in doc.getElementsByTagName("manifest:file-entry"):
             entry = self.__entry_from_xml(elem)
-            if entry:
-                self.insert_entry(entry)
+            if entry is None:
+                return False
+
+            # Skip entry for bundle root that is always present
+            if entry["full-path"] == "/":
+                continue
+
+            self.insert_entry(entry)
 
     def save(self):
         pass
