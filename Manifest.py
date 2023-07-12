@@ -1,4 +1,4 @@
-import pathlib
+import os.path
 import xml.dom.minidom as MD
 
 MANIFEST_PATH  = "META-INF/manifest.xml"
@@ -21,7 +21,7 @@ class Manifest:
         self.entries = {}
 
     def exists(self):
-        return pathlib.Path(self.path).is_file()
+        return os.path.isfile(self.path)
 
     def load(self):
         doc = MD.parse(self.path)
