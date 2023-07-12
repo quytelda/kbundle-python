@@ -41,6 +41,8 @@ class Manifest:
 
             self.insert_entry(entry)
 
+        return True
+
     def save(self):
         manifestFile = open(self.path, "w")
 
