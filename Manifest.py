@@ -30,6 +30,7 @@ class Manifest:
         if root.tagName != TAG_MANIFEST or root.getAttribute(ATTR_VERSION) != "1.2":
             return False;
 
+        self.entries = {}
         for e in doc.getElementsByTagName(TAG_FILE_ENTRY):
             entry = self.__entry_from_xml(e)
             if entry is None:
