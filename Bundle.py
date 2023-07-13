@@ -59,9 +59,6 @@ class Bundle:
 
         return True
 
-    def prune_manifest(self):
-        pass
-
     def update_manifest(self):
         if not self.resources:
             return False
