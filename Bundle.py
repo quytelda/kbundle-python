@@ -92,8 +92,16 @@ class Bundle:
     def __external_path(self, ipath):
         return os.path.join(self.root, ipath)
 
-    def __internal_path(self, xpath):
-        return os.path.relpath(xpath, start=self.root)
+    def __internal_path(self, path):
+        # Check whether the given path refers to a location inside the
+        # bundle tree. If not, assume the path is relative to the
+        # bundle root instead of the current directory (i.e. the path
+        # is already internal).
+        abs_root = os.path.abspath(self.root)
+        abs_path = os.path.abspath(path)
+        relative = abs_root != os.path.commonpath([abs_root, abs_path])
+
+        return path if relative else os.path.relpath(abs_path, start=self.root)
 
     def __generate_entry(self, xpath):
         if not os.path.isfile(xpath):
