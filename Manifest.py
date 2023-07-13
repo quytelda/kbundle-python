@@ -1,14 +1,14 @@
 import os.path
 import xml.dom.minidom as MD
 
-MANIFEST_PATH  = "META-INF/manifest.xml"
-MANIFEST_XMLNS = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+MANIFEST_PATH   = "META-INF/manifest.xml"
+MANIFEST_XMLNS  = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
 
 # XML Node Names
-TAG_MANIFEST    = "manifest:manifest"
-TAG_FILE_ENTRY  = "manifest:file-entry"
-TAG_TAGS        = "manifest:tags"
-TAG_TAG         = "manifest:tag"
+ELEM_MANIFEST   = "manifest:manifest"
+ELEM_FILE_ENTRY = "manifest:file-entry"
+ELEM_TAGS       = "manifest:tags"
+ELEM_TAG        = "manifest:tag"
 ATTR_VERSION    = "manifest:version"
 ATTR_MEDIA_TYPE = "manifest:media-type"
 ATTR_FULL_PATH  = "manifest:full-path"
@@ -27,11 +27,11 @@ class Manifest:
         doc = MD.parse(self.path)
 
         root = doc.documentElement
-        if root.tagName != TAG_MANIFEST or root.getAttribute(ATTR_VERSION) != "1.2":
+        if root.tagName != ELEM_MANIFEST or root.getAttribute(ATTR_VERSION) != "1.2":
             return False;
 
         self.entries = {}
-        for e in doc.getElementsByTagName(TAG_FILE_ENTRY):
+        for e in doc.getElementsByTagName(ELEM_FILE_ENTRY):
             entry = self.__entry_from_xml(e)
             if entry is None:
                 return False
@@ -95,14 +95,14 @@ class Manifest:
         return True
 
     def to_xml(self):
-        doc = MD.getDOMImplementation().createDocument(MANIFEST_XMLNS, TAG_MANIFEST, None)
+        doc = MD.getDOMImplementation().createDocument(MANIFEST_XMLNS, ELEM_MANIFEST, None)
 
         root = doc.documentElement
         root.setAttribute("xmlns:manifest", MANIFEST_XMLNS)
         root.setAttribute(ATTR_VERSION, "1.2")
 
         # A file-entry for the bundle's root directory is always included.
-        dir_entry = doc.createElement(TAG_FILE_ENTRY)
+        dir_entry = doc.createElement(ELEM_FILE_ENTRY)
         dir_entry.setAttribute(ATTR_MEDIA_TYPE, "application/x-krita-resourcebundle")
         dir_entry.setAttribute(ATTR_FULL_PATH , "/")
         root.appendChild(dir_entry)
@@ -118,14 +118,14 @@ class Manifest:
 
     def __tags_from_xml(self, e):
         tags = []
-        for tags_elem in e.getElementsByTagName(TAG_TAGS):
-            for tag_elem in tags_elem.getElementsByTagName(TAG_TAG):
+        for tags_elem in e.getElementsByTagName(ELEM_TAGS):
+            for tag_elem in tags_elem.getElementsByTagName(ELEM_TAG):
                 tags.append(tag_elem.firstChild.data)
 
         return tags
 
     def __entry_from_xml(self, e):
-        if e.tagName != TAG_FILE_ENTRY:
+        if e.tagName != ELEM_FILE_ENTRY:
             return None
 
         entry = {
@@ -138,11 +138,11 @@ class Manifest:
         return entry
 
     def __tags_to_xml(self, doc, tags):
-        tags_elem = doc.createElement(TAG_TAGS)
+        tags_elem = doc.createElement(ELEM_TAGS)
 
         for tag in tags:
             tag_text = doc.createTextNode(tag)
-            tag_elem = doc.createElement(TAG_TAG)
+            tag_elem = doc.createElement(ELEM_TAG)
 
             tag_elem.appendChild(tag_text)
             tags_elem.appendChild(tag_elem)
@@ -150,7 +150,7 @@ class Manifest:
         return tags_elem
 
     def __entry_to_xml(self, doc, entry):
-        entry_elem = doc.createElement(TAG_FILE_ENTRY)
+        entry_elem = doc.createElement(ELEM_FILE_ENTRY)
 
         entry_elem.setAttribute(ATTR_MEDIA_TYPE, entry["media-type"])
         entry_elem.setAttribute(ATTR_FULL_PATH , entry["full-path"] )
