@@ -19,7 +19,15 @@ class Bundle:
         self.resources = []
 
     def load(self):
-        pass
+        if self.manifest.exists() and not self.manifest.load():
+            print("Failed to load manifest file.", file=sys.stderr)
+            return False
+
+        if not self.scan_files():
+            print("Failed to scan bundle directory.", file=sys.stderr)
+            return False
+
+        return True
 
     def scan_files(self):
         if not os.path.isdir(self.root):
