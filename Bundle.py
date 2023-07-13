@@ -81,11 +81,23 @@ class Bundle:
         self.manifest.save()
         return True
 
-    def add_tag(self):
-        pass
+    def add_tag(self, path, tag):
+        ipath = self.__internal_path(path)
+        if not self.manifest.add_tag(ipath, tag):
+            print("Failed to add tag for resource: {}".format(ipath), file=sys.stderr)
+            return False
 
-    def remove_tag(self):
-        pass
+        self.manifest.save()
+        return True
+
+    def remove_tag(self, path, tag):
+        ipath = self.__internal_path(path)
+        if not self.manifest.remove_tag(ipath, tag):
+            print("Failed to remove tag for resource: {}".format(ipath), file=sys.stderr)
+            return False
+
+        self.manifest.save()
+        return True
 
     def build(self):
         pass
