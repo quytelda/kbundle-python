@@ -1,3 +1,4 @@
+import hashlib
 import sys
 import os.path
 import Manifest
@@ -10,6 +11,17 @@ RESOURCE_DIR_NAMES = ["brushes",
                       "patterns",
                       "seexpr_scripts",
                       "workspaces"]
+
+def parent_dir_name(path):
+    parent_dir_path = os.path.dirname(path)
+    return os.path.basename(parent_dir_path)
+
+def md5sum(path):
+    alg = hashlib.md5()
+    with open(path, "rb") as file:
+        alg.update(file.read())
+
+    return alg.hexdigest()
 
 class Bundle:
     def __init__(self, path):
@@ -67,6 +79,19 @@ class Bundle:
 
     def __internal_path(self, xpath):
         return os.path.relpath(xpath, start=self.root)
+
+    def __generate_entry(self, xpath):
+        if not os.path.isfile(xpath):
+            print("Not a resource file: {}".format(xpath), file=sys.stderr)
+            return None
+
+        entry = {
+            "media-type" : parent_dir_name(xpath),
+            "full-path"  : self.__internal_path(xpath),
+            "md5sum"     : md5sum(xpath),
+            "tags"       : []
+        }
+        return entry
 
     def __zip_add_file(self):
         pass
