@@ -42,8 +42,8 @@ class Bundle:
                 continue
 
             for filename in os.listdir(dirpath):
-                filepath = os.path.join(dirpath, filename)
-                self.resources.append(filepath)
+                ipath = os.path.join(dirname, filename)
+                self.resources.append(ipath)
 
         return True
 
