@@ -1,6 +1,8 @@
 import hashlib
 import sys
 import os.path
+import zipfile as Zip
+import zlib
 import Manifest
 
 RESOURCE_DIR_NAMES = ["brushes",
@@ -99,8 +101,26 @@ class Bundle:
         self.manifest.save()
         return True
 
-    def build(self):
-        pass
+    def build(self, archive_path):
+        with Zip.ZipFile(archive_path, 'w',
+                         compression=Zip.ZIP_DEFLATED,
+                         allowZip64=False,
+                         compresslevel=zlib.Z_DEFAULT_COMPRESSION) as zip:
+
+            def zip_add_file(ipath):
+                xpath = self.__external_path(ipath)
+                zip.write(xpath, arcname=ipath)
+
+            zip_add_file("mimetype")
+
+            for ipath in self.resources:
+                zip_add_file(ipath)
+
+            zip_add_file("preview.png")
+            zip_add_file(Manifest.MANIFEST_PATH)
+            zip_add_file("meta.xml")
+
+        return True
 
     def __external_path(self, ipath):
         return os.path.join(self.root, ipath)
@@ -143,6 +163,3 @@ class Bundle:
     def __remove_entry(self, ipath, info="REMOVE"):
         print("{}: {}".format(info, ipath))
         return self.manifest.remove_entry(ipath)
-
-    def __zip_add_file(self):
-        pass
