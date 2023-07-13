@@ -78,6 +78,7 @@ class Bundle:
             if not self.__insert_entry(ipath, info="UPDATE"):
                 return False
 
+        self.manifest.save()
         return True
 
     def add_tag(self):
