@@ -63,7 +63,25 @@ class Bundle:
         pass
 
     def update_manifest(self):
-        pass
+        if not self.resources:
+            return False
+
+        common, mf_only, file_only = self.manifest.compare_entries(self.resources)
+
+        # Remove resources that exist in the manifest but not on disk
+        for ipath in mf_only:
+            if not self.__remove_entry(ipath, info="REMOVE"):
+                return False
+
+        for ipath in file_only:
+            if not self.__insert_entry(ipath, info="INSERT"):
+                return False
+
+        for ipath in common:
+            if not self.__insert_entry(ipath, info="UPDATE"):
+                return False
+
+        return True
 
     def add_tag(self):
         pass
