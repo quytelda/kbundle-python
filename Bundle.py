@@ -1,8 +1,11 @@
+import os.path
 import Manifest
 
 class Bundle:
     def __init__(self, path):
-        pass
+        self.root = path
+        manifest_path = os.path.join(path, Manifest.MANIFEST_PATH)
+        self.manifest = Manifest.Manifest(manifest_path)
 
     def scan_files(self):
         pass
