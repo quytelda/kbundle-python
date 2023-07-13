@@ -3,7 +3,7 @@ import sys
 import os.path
 import zipfile as Zip
 import zlib
-import Manifest
+import manifest
 
 RESOURCE_DIR_NAMES = ["brushes",
                       "gamutmasks",
@@ -28,8 +28,8 @@ def md5sum(path):
 class Bundle:
     def __init__(self, path):
         self.root = path
-        manifest_path = self.__external_path(Manifest.MANIFEST_PATH)
-        self.manifest = Manifest.Manifest(manifest_path)
+        manifest_path = self.__external_path(manifest.MANIFEST_PATH)
+        self.manifest = manifest.Manifest(manifest_path)
         self.resources = []
 
     def load(self):
@@ -117,7 +117,7 @@ class Bundle:
                 zip_add_file(ipath)
 
             zip_add_file("preview.png")
-            zip_add_file(Manifest.MANIFEST_PATH)
+            zip_add_file(manifest.MANIFEST_PATH)
             zip_add_file("meta.xml")
 
         return True
