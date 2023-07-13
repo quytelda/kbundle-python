@@ -93,5 +93,20 @@ class Bundle:
         }
         return entry
 
+    def __insert_entry(self, ipath, info="INSERT"):
+        print("{}: {}".format(info, ipath))
+        xpath = self.__external_path(ipath)
+        entry = self.__generate_entry(xpath)
+        if entry is None:
+            print("Failed to create entry for file: {}".format(xpath), file=sys.stderr)
+            return False
+
+        self.manifest.insert_entry(entry)
+        return True
+
+    def __remove_entry(self, ipath, info="REMOVE"):
+        print("{}: {}".format(info, ipath))
+        return self.manifest.remove_entry(ipath)
+
     def __zip_add_file(self):
         pass
