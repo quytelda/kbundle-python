@@ -4,7 +4,7 @@ import Manifest
 class Bundle:
     def __init__(self, path):
         self.root = path
-        manifest_path = os.path.join(path, Manifest.MANIFEST_PATH)
+        manifest_path = self.__external_path(Manifest.MANIFEST_PATH)
         self.manifest = Manifest.Manifest(manifest_path)
 
     def scan_files(self):
@@ -28,11 +28,11 @@ class Bundle:
     def build(self):
         pass
 
-    def __external_path(self):
-        pass
+    def __external_path(self, ipath):
+        return os.path.join(self.root, ipath)
 
-    def __internal_path(self):
-        pass
+    def __internal_path(self, xpath):
+        return os.path.relpath(xpath, start=self.root)
 
     def __zip_add_file(self):
         pass
