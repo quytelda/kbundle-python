@@ -74,6 +74,16 @@ class Manifest:
     def has_entry(self, path):
         return path in self.entries
 
+    def compare_entries(self, entry_list):
+        entries_here  = set(self.entries.keys())
+        entries_there = set(entry_list)
+
+        common     = entries_here  & entries_there
+        only_here  = entries_here  - entries_there
+        only_there = entries_there - entries_here
+
+        return (common, only_here, only_there)
+
     def add_tag(self, path, tag):
         if not self.has_entry(path):
             return False
