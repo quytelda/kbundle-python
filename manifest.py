@@ -140,9 +140,6 @@ class Manifest:
 
         return doc
 
-    def resource_list(self):
-        pass
-
     def __tags_from_xml(self, e):
         tags = []
         for tags_elem in e.getElementsByTagName(ELEM_TAGS):
