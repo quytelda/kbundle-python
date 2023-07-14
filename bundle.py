@@ -22,6 +22,7 @@ import zipfile as Zip
 import zlib
 import manifest
 
+BUNDLE_MIMETYPE = b'application/x-krita-resourcebundle'
 RESOURCE_DIR_NAMES = ["brushes",
                       "gamutmasks",
                       "gradients",
@@ -128,7 +129,12 @@ class Bundle:
                 xpath = self.__external_path(ipath)
                 zip.write(xpath, arcname=ipath)
 
-            zip_add_file("mimetype")
+            # The mimetype file must be the first entry in the
+            # archive. It must contain only the ASCII-encoded
+            # mime-type string and be uncompressed.
+            zip.writestr("mimetype", BUNDLE_MIMETYPE,
+                         compress_type=Zip.ZIP_STORED,
+                         compresslevel=zlib.Z_NO_COMPRESSION)
 
             for ipath in self.resources:
                 zip_add_file(ipath)
