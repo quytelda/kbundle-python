@@ -155,9 +155,13 @@ class Manifest:
         if e.tagName != ELEM_FILE_ENTRY:
             return None
 
+        # Resource paths in the manifest must use forward slash (/)
+        # separators, so we must convert them into the local style.
+        fixed_path = os.path.normpath(e.getAttribute(ATTR_FULL_PATH))
+
         entry = {
+            "full-path"  : fixed_path,
             "media-type" : e.getAttribute(ATTR_MEDIA_TYPE),
-            "full-path"  : e.getAttribute(ATTR_FULL_PATH ),
             "md5sum"     : e.getAttribute(ATTR_MD5SUM    ),
             "tags"       : self.__tags_from_xml(e)
         }
@@ -179,8 +183,12 @@ class Manifest:
     def __entry_to_xml(self, doc, entry):
         entry_elem = doc.createElement(ELEM_FILE_ENTRY)
 
+        # Resource paths in the manifest must use forward slash (/)
+        # separators, so Windows-style paths need to be fixed.
+        fixed_path = entry["full-path"].replace("\\", "/")
+
         entry_elem.setAttribute(ATTR_MEDIA_TYPE, entry["media-type"])
-        entry_elem.setAttribute(ATTR_FULL_PATH , entry["full-path"] )
+        entry_elem.setAttribute(ATTR_FULL_PATH , fixed_path         )
         entry_elem.setAttribute(ATTR_MD5SUM    , entry["md5sum"]    )
 
         if entry["tags"]:
