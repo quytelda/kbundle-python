@@ -53,8 +53,8 @@ class Manifest:
             if entry is None:
                 return False
 
-            # Skip entry for bundle root that is always present
-            if entry["full-path"] == "/":
+            # Skip entry for bundle root that is always present.
+            if entry["full-path"] == "/" or entry["full-path"] == "\\":
                 continue
 
             self.insert_entry(entry)
