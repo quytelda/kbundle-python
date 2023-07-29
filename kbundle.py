@@ -50,7 +50,7 @@ def main(args):
     if command == "update":
         ok = bundle.update_manifest()
     elif command == "build":
-        ok = bundle.build(args[0])
+        ok = bundle.pack(args[0])
     elif command == "add-tag":
         ok = bundle.add_tag(args[1], args[0])
     elif command == "remove-tag":

@@ -119,8 +119,8 @@ class Bundle:
         self.manifest.save()
         return True
 
-    def build(self, archive_path):
-        with Zip.ZipFile(archive_path, 'w',
+    def pack(self, archive_path):
+        with Zip.ZipFile(archive_path, mode='w',
                          compression=Zip.ZIP_DEFLATED,
                          allowZip64=False,
                          compresslevel=zlib.Z_DEFAULT_COMPRESSION) as zip:
