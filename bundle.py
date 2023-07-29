@@ -119,6 +119,18 @@ class Bundle:
         self.manifest.save()
         return True
 
+    def unpack(self, archive_path):
+        with Zip.ZipFile(archive_path, mode='r',
+                         compression=Zip.ZIP_DEFLATED,
+                         allowZip64=False,
+                         compresslevel=zlib.Z_DEFAULT_COMPRESSION) as zip:
+            zip.extractall(path=self.root)
+
+        # Remove the extraneous "mimetype" file. The file is
+        # automatically inserted into bundle archives, so storing it
+        # is unecessary.
+        os.remove(self.__external_path("mimetype"))
+
     def pack(self, archive_path):
         with Zip.ZipFile(archive_path, mode='w',
                          compression=Zip.ZIP_DEFLATED,
