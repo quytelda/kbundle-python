@@ -43,6 +43,14 @@ def md5sum(path):
 
     return alg.hexdigest()
 
+# Zip Compression Options
+# https://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part3.html
+ZIP_OPTIONS = {
+    "allowZip64"    : False,
+    "compression"   : Zip.ZIP_DEFLATED,
+    "compresslevel" : zlib.Z_DEFAULT_COMPRESSION
+}
+
 class Bundle:
     def __init__(self, path):
         self.root = path
@@ -120,10 +128,7 @@ class Bundle:
         return True
 
     def unpack(self, archive_path):
-        with Zip.ZipFile(archive_path, mode='r',
-                         compression=Zip.ZIP_DEFLATED,
-                         allowZip64=False,
-                         compresslevel=zlib.Z_DEFAULT_COMPRESSION) as zip:
+        with Zip.ZipFile(archive_path, mode='r', **ZIP_OPTIONS) as zip:
             zip.extractall(path=self.root)
 
         # Remove the extraneous "mimetype" file. The file is
@@ -132,10 +137,7 @@ class Bundle:
         os.remove(self.__external_path("mimetype"))
 
     def pack(self, archive_path):
-        with Zip.ZipFile(archive_path, mode='w',
-                         compression=Zip.ZIP_DEFLATED,
-                         allowZip64=False,
-                         compresslevel=zlib.Z_DEFAULT_COMPRESSION) as zip:
+        with Zip.ZipFile(archive_path, mode='w', **ZIP_OPTIONS) as zip:
 
             def zip_add_file(ipath):
                 xpath = self.__external_path(ipath)
