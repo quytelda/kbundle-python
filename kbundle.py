@@ -37,6 +37,9 @@ def tag_add(bundle, args):
 def tag_del(bundle, args):
     return bundle.remove_tag(args.path, args.tag)
 
+def tag_ls(bundle, args):
+    return bundle.print_tags(args.path)
+
 def get_argument_parser():
     parser = argparse.ArgumentParser()
     parser.set_defaults(load=True)
@@ -60,6 +63,10 @@ def get_argument_parser():
 
     parser_tag = subparsers.add_parser("tag")
     subparsers_tag = parser_tag.add_subparsers()
+
+    parser_tag_ls = subparsers_tag.add_parser("ls")
+    parser_tag_ls.set_defaults(func=tag_ls)
+    parser_tag_ls.add_argument("path")
 
     parser_tag_add = subparsers_tag.add_parser("add")
     parser_tag_add.set_defaults(func=tag_add)

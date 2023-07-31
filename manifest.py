@@ -101,6 +101,12 @@ class Manifest:
 
         return (common, only_here, only_there)
 
+    def tags(self, path):
+        if not self.has_entry(path):
+            return None
+
+        return self.entries[path]["tags"]
+
     def add_tag(self, path, tag):
         if not self.has_entry(path):
             return False
