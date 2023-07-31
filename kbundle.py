@@ -20,46 +20,68 @@
 import bundle as B
 import sys
 import os
+import argparse
 
-def index_of(x, xs):
-    try:
-        return xs.index(x)
-    except ValueError:
-        return -1
+def unpack(bundle, args):
+    bundle.unpack(args.path)
 
-def main(args):
-    bundle_root = os.curdir
+def pack(bundle, args):
+    bundle.pack(args.path)
 
-    i = index_of("-r", args)
-    if i >= 0 and (i+1) < len(args):
-        args.pop(i)
-        bundle_root = args.pop(i)
+def update(bundle, args):
+    bundle.update_manifest()
 
-    if len(args) <= 0:
-        print("Not enough arguments!", file=sys.stderr)
-        print("Usage: kbundle [-r <DIR>] <COMMAND> [ARG]...")
-        return 1
+def tag_add(bundle, args):
+    bundle.add_tag(args.path, args.tag)
 
-    command = args.pop(0)
-    bundle = B.Bundle(bundle_root)
-    if not bundle.load():
+def tag_del(bundle, args):
+    bundle.remove_tag(args.path, args.tag)
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser()
+    parser.set_defaults(load=True)
+    parser.add_argument("-r", "--root",
+                        default=os.curdir,
+                        metavar="DIR",
+                        help="the root directory of a bundle tree")
+
+    subparsers = parser.add_subparsers()
+
+    parser_update = subparsers.add_parser("update")
+    parser_update.set_defaults(func=update)
+
+    parser_pack   = subparsers.add_parser("pack")
+    parser_pack.set_defaults(func=pack)
+    parser_pack.add_argument("path")
+
+    parser_unpack = subparsers.add_parser("unpack")
+    parser_unpack.set_defaults(func=unpack, load=False)
+    parser_unpack.add_argument("path")
+
+    parser_tag = subparsers.add_parser("tag")
+    subparsers_tag = parser_tag.add_subparsers()
+
+    parser_tag_add = subparsers_tag.add_parser("add")
+    parser_tag_add.set_defaults(func=tag_add)
+    parser_tag_add.add_argument("tag")
+    parser_tag_add.add_argument("path")
+
+    parser_tag_remove = subparsers_tag.add_parser("remove")
+    parser_tag_remove.set_defaults(func=tag_del)
+    parser_tag_remove.add_argument("tag")
+    parser_tag_remove.add_argument("path")
+
+    return parser
+
+def main():
+    args = get_argument_parser().parse_args()
+
+    bundle = B.Bundle(args.root)
+    if args.load and not bundle.load():
         print("Failed to load bundle.", file=sys.stderr)
         return 2
 
-    ok = False
-    if command == "update":
-        ok = bundle.update_manifest()
-    elif command == "build":
-        ok = bundle.pack(args[0])
-    elif command == "add-tag":
-        ok = bundle.add_tag(args[1], args[0])
-    elif command == "remove-tag":
-        ok = bundle.remove_tag(args[1], args[0])
-    else:
-        print("Unrecognized command or not enough arguments.", file=sys.stderr)
-
-    return 0 if ok else 3
+    args.func(bundle, args)
 
 if __name__ == "__main__":
-    result = main(sys.argv[1:])
-    exit(result)
+    main()
