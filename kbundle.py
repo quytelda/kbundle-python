@@ -48,35 +48,35 @@ def get_argument_parser():
                         metavar="DIR",
                         help="the root directory of a bundle tree")
 
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(required=True)
 
-    parser_update = subparsers.add_parser("update")
+    parser_update = subparsers.add_parser("update", help="rebuild the bundle manifest")
     parser_update.set_defaults(func=update)
 
-    parser_pack   = subparsers.add_parser("pack")
+    parser_pack   = subparsers.add_parser("pack", help="zip a bundle tree into a bundle archive")
     parser_pack.set_defaults(func=pack)
-    parser_pack.add_argument("path")
+    parser_pack.add_argument("path", help="output bundle file")
 
-    parser_unpack = subparsers.add_parser("unpack")
+    parser_unpack = subparsers.add_parser("unpack", help="unzip a bundle archive into a bundle tree")
     parser_unpack.set_defaults(func=unpack, load=False)
-    parser_unpack.add_argument("path")
+    parser_unpack.add_argument("path", help="input bundle file")
 
-    parser_tag = subparsers.add_parser("tag")
+    parser_tag = subparsers.add_parser("tag", help="inspect or modify resource tags")
     subparsers_tag = parser_tag.add_subparsers()
 
-    parser_tag_ls = subparsers_tag.add_parser("ls")
+    parser_tag_ls = subparsers_tag.add_parser("ls", help="list tags")
     parser_tag_ls.set_defaults(func=tag_ls)
-    parser_tag_ls.add_argument("path")
+    parser_tag_ls.add_argument("path", help="resource file")
 
-    parser_tag_add = subparsers_tag.add_parser("add")
+    parser_tag_add = subparsers_tag.add_parser("add", help="add a tag")
     parser_tag_add.set_defaults(func=tag_add)
-    parser_tag_add.add_argument("tag")
-    parser_tag_add.add_argument("path")
+    parser_tag_add.add_argument("tag", help="tag to add")
+    parser_tag_add.add_argument("path", help="resource file to tag")
 
-    parser_tag_remove = subparsers_tag.add_parser("remove")
+    parser_tag_remove = subparsers_tag.add_parser("remove", help="remove a tag")
     parser_tag_remove.set_defaults(func=tag_del)
-    parser_tag_remove.add_argument("tag")
-    parser_tag_remove.add_argument("path")
+    parser_tag_remove.add_argument("tag", help="tag to remove")
+    parser_tag_remove.add_argument("path", help="resource file to untag")
 
     return parser
 
