@@ -23,19 +23,19 @@ import os
 import argparse
 
 def unpack(bundle, args):
-    bundle.unpack(args.path)
+    return bundle.unpack(args.path)
 
 def pack(bundle, args):
-    bundle.pack(args.path)
+    return bundle.pack(args.path)
 
 def update(bundle, args):
-    bundle.update_manifest()
+    return bundle.update_manifest()
 
 def tag_add(bundle, args):
-    bundle.add_tag(args.path, args.tag)
+    return bundle.add_tag(args.path, args.tag)
 
 def tag_del(bundle, args):
-    bundle.remove_tag(args.path, args.tag)
+    return bundle.remove_tag(args.path, args.tag)
 
 def get_argument_parser():
     parser = argparse.ArgumentParser()
@@ -81,7 +81,9 @@ def main():
         print("Failed to load bundle.", file=sys.stderr)
         return 2
 
-    args.func(bundle, args)
+    ok = args.func(bundle, args)
+    return 0 if ok else 3
 
 if __name__ == "__main__":
-    main()
+    result = main()
+    exit(result)

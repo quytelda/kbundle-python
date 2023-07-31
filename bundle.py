@@ -136,6 +136,8 @@ class Bundle:
         # is unecessary.
         os.remove(self.__external_path("mimetype"))
 
+        return True
+
     def pack(self, archive_path):
         with Zip.ZipFile(archive_path, mode='w', **ZIP_OPTIONS) as zip:
 
