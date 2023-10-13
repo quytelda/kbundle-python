@@ -20,6 +20,7 @@ import sys
 import os.path
 import zipfile as Zip
 import zlib
+import pprint
 import manifest
 
 BUNDLE_MIMETYPE = b'application/x-krita-resourcebundle'
@@ -109,12 +110,24 @@ class Bundle:
         self.manifest.save()
         return True
 
+    def print_tags(self, path):
+        ipath = self.__internal_path(path)
+
+        tags = self.manifest.tags(ipath)
+        if tags is None:
+            print("No matching entry in manifest: {}".format(ipath), file=sys.stderr)
+            return False
+
+        pprint.pprint(tags)
+        return True
+
     def add_tag(self, path, tag):
         ipath = self.__internal_path(path)
         if not self.manifest.add_tag(ipath, tag):
             print("Failed to add tag for resource: {}".format(ipath), file=sys.stderr)
             return False
 
+        self.print_tags(path)
         self.manifest.save()
         return True
 
@@ -124,6 +137,7 @@ class Bundle:
             print("Failed to remove tag for resource: {}".format(ipath), file=sys.stderr)
             return False
 
+        self.print_tags(path)
         self.manifest.save()
         return True
 
@@ -135,6 +149,8 @@ class Bundle:
         # automatically inserted into bundle archives, so storing it
         # is unecessary.
         os.remove(self.__external_path("mimetype"))
+
+        return True
 
     def pack(self, archive_path):
         with Zip.ZipFile(archive_path, mode='w', **ZIP_OPTIONS) as zip:
