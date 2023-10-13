@@ -33,9 +33,29 @@ RESOURCE_DIR_NAMES = ["brushes",
                       "seexpr_scripts",
                       "workspaces"]
 
-def parent_dir_name(path):
-    parent_dir_path = os.path.dirname(path)
-    return os.path.basename(parent_dir_path)
+def is_visible(filename):
+    return not filename.startswith('.')
+
+def list_recursively(dirname):
+    results = []
+    for current_dir, subdirs, files in os.walk(dirname):
+        # Prune dotfiles
+        subdirs[:] = filter(is_visible, subdirs)
+        files[:]   = filter(is_visible, files)
+
+        dirpath = os.path.abspath(current_dir)
+        results += map(lambda filename: os.path.join(dirpath, filename), files)
+
+    return results
+
+def topmost_dir_name(path):
+    head = path
+    tail = ""
+
+    while head:
+        head, tail = os.path.split(head)
+
+    return tail
 
 def md5sum(path):
     alg = hashlib.md5()
@@ -82,9 +102,8 @@ class Bundle:
             if not os.path.isdir(dirpath):
                 continue
 
-            for filename in os.listdir(dirpath):
-                ipath = os.path.join(dirname, filename)
-                self.resources.append(ipath)
+            resource_paths = list_recursively(dirpath)
+            self.resources += map(self.__internal_path, resource_paths)
 
         return True
 
@@ -194,9 +213,10 @@ class Bundle:
             print("Not a resource file: {}".format(xpath), file=sys.stderr)
             return None
 
+        ipath = self.__internal_path(xpath)
         entry = {
-            "media-type" : parent_dir_name(xpath),
-            "full-path"  : self.__internal_path(xpath),
+            "media-type" : topmost_dir_name(ipath),
+            "full-path"  : ipath,
             "md5sum"     : md5sum(xpath),
             "tags"       : []
         }
