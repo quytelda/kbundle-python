@@ -69,9 +69,9 @@ class Manifest:
             os.mkdir(dir_path)
 
         doc = self.to_xml()
-        output = doc.toprettyxml(indent=' ')
+        output = doc.toprettyxml(indent=' ', encoding='UTF-8')
 
-        with open(self.path, "w") as manifestFile:
+        with open(self.path, "wb") as manifestFile:
             manifestFile.write(output)
 
     def insert_entry(self, entry):
