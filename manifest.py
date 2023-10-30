@@ -17,6 +17,7 @@
 
 import os.path
 import xml.dom.minidom as MD
+import pprint
 from dataclasses import dataclass
 
 MANIFEST_PATH   = "META-INF/manifest.xml"
@@ -40,6 +41,13 @@ class ManifestEntry:
     media_type: str
     md5sum: str
     tags: list[str]
+
+    def to_string(self):
+        tag_list = pprint.pformat(self.tags)
+        return '\n'.join([self.full_path,
+                          "\tmedia-type: {}".format(self.media_type),
+                          "\tmd5sum: {}".format(self.md5sum),
+                          "\ttags: {}".format(tag_list)])
 
 class Manifest:
 
@@ -155,6 +163,9 @@ class Manifest:
             root.appendChild(entry_elem)
 
         return doc
+
+    def to_string(self):
+        return '\n\n'.join([entry.to_string() for entry in self.entries.values()])
 
     def __tags_from_xml(self, e):
         tags = []

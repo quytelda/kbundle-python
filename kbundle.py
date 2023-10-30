@@ -31,6 +31,9 @@ def pack(bundle, args):
 def update(bundle, args):
     return bundle.update_manifest()
 
+def list(bundle, args):
+    return bundle.print_manifest_entries()
+
 def tag_add(bundle, args):
     return bundle.add_tag(args.path, args.tag)
 
@@ -52,6 +55,9 @@ def get_argument_parser():
 
     parser_update = subparsers.add_parser("update", help="rebuild the bundle manifest")
     parser_update.set_defaults(func=update)
+
+    parser_list = subparsers.add_parser("list", help="list all entries in the manifest")
+    parser_list.set_defaults(func=list)
 
     parser_pack   = subparsers.add_parser("pack", help="zip a bundle tree into a bundle archive")
     parser_pack.set_defaults(func=pack)

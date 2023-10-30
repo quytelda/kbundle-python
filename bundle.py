@@ -129,6 +129,10 @@ class Bundle:
         self.manifest.save()
         return True
 
+    def print_manifest_entries(self):
+        print(self.manifest.to_string())
+        return True
+
     def print_tags(self, path):
         ipath = self.__internal_path(path)
 
