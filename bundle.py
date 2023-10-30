@@ -214,13 +214,11 @@ class Bundle:
             return None
 
         ipath = self.__internal_path(xpath)
-        entry = {
-            "media-type" : topmost_dir_name(ipath),
-            "full-path"  : ipath,
-            "md5sum"     : md5sum(xpath),
-            "tags"       : []
-        }
-        return entry
+
+        return manifest.ManifestEntry(full_path  = ipath,
+                                      media_type = topmost_dir_name(ipath),
+                                      md5sum     = md5sum(xpath),
+                                      tags       = [])
 
     def __insert_entry(self, ipath, info="INSERT"):
         print("{}: {}".format(info, ipath))

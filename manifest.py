@@ -17,6 +17,7 @@
 
 import os.path
 import xml.dom.minidom as MD
+from dataclasses import dataclass
 
 MANIFEST_PATH   = "META-INF/manifest.xml"
 MANIFEST_XMLNS  = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
@@ -30,6 +31,15 @@ ATTR_VERSION    = "manifest:version"
 ATTR_MEDIA_TYPE = "manifest:media-type"
 ATTR_FULL_PATH  = "manifest:full-path"
 ATTR_MD5SUM     = "manifest:md5sum"
+
+@dataclass
+class ManifestEntry:
+    """ManifestEntry is a class which represents an entry in the manifest."""
+
+    full_path: str
+    media_type: str
+    md5sum: str
+    tags: list[str]
 
 class Manifest:
 
@@ -54,7 +64,7 @@ class Manifest:
                 return False
 
             # Skip entry for bundle root that is always present.
-            if entry["full-path"] == "/" or entry["full-path"] == "\\":
+            if entry.full_path == "/" or entry.full_path == "\\":
                 continue
 
             self.insert_entry(entry)
@@ -75,9 +85,9 @@ class Manifest:
             manifestFile.write(output)
 
     def insert_entry(self, entry):
-        path = entry["full-path"]
+        path = entry.full_path
         if path in self.entries:
-            entry["tags"] += self.entries[path]["tags"]
+            entry.tags += self.entries[path].tags
 
         self.entries[path] = entry
 
@@ -105,26 +115,26 @@ class Manifest:
         if not self.has_entry(path):
             return None
 
-        return self.entries[path]["tags"]
+        return self.entries[path].tags
 
     def add_tag(self, path, tag):
         if not self.has_entry(path):
             return False
 
-        if tag in self.entries[path]["tags"]:
+        if tag in self.entries[path].tags:
             return False
 
-        self.entries[path]["tags"].append(tag)
+        self.entries[path].tags.append(tag)
         return True
 
     def remove_tag(self, path, tag):
         if not self.has_entry(path):
             return False
 
-        if tag not in self.entries[path]["tags"]:
+        if tag not in self.entries[path].tags:
             return False
 
-        self.entries[path]["tags"].remove(tag)
+        self.entries[path].tags.remove(tag)
         return True
 
     def to_xml(self):
@@ -162,13 +172,10 @@ class Manifest:
         # separators, so we must convert them into the local style.
         fixed_path = os.path.normpath(e.getAttribute(ATTR_FULL_PATH))
 
-        entry = {
-            "full-path"  : fixed_path,
-            "media-type" : e.getAttribute(ATTR_MEDIA_TYPE),
-            "md5sum"     : e.getAttribute(ATTR_MD5SUM    ),
-            "tags"       : self.__tags_from_xml(e)
-        }
-
+        entry = ManifestEntry(full_path  = fixed_path,
+                              media_type = e.getAttribute(ATTR_MEDIA_TYPE),
+                              md5sum     = e.getAttribute(ATTR_MD5SUM    ),
+                              tags       = self.__tags_from_xml(e))
         return entry
 
     def __tags_to_xml(self, doc, tags):
@@ -188,14 +195,14 @@ class Manifest:
 
         # Resource paths in the manifest must use forward slash (/)
         # separators, so Windows-style paths need to be fixed.
-        fixed_path = entry["full-path"].replace("\\", "/")
+        fixed_path = entry.full_path.replace("\\", "/")
 
-        entry_elem.setAttribute(ATTR_MEDIA_TYPE, entry["media-type"])
-        entry_elem.setAttribute(ATTR_FULL_PATH , fixed_path         )
-        entry_elem.setAttribute(ATTR_MD5SUM    , entry["md5sum"]    )
+        entry_elem.setAttribute(ATTR_MEDIA_TYPE, entry.media_type)
+        entry_elem.setAttribute(ATTR_FULL_PATH , fixed_path      )
+        entry_elem.setAttribute(ATTR_MD5SUM    , entry.md5sum    )
 
-        if entry["tags"]:
-            tags_elem = self.__tags_to_xml(doc, entry["tags"])
+        if entry.tags:
+            tags_elem = self.__tags_to_xml(doc, entry.tags)
             entry_elem.appendChild(tags_elem)
 
         return entry_elem
