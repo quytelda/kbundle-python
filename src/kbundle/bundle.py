@@ -21,7 +21,8 @@ import os.path
 import zipfile as Zip
 import zlib
 import pprint
-import manifest
+
+import kbundle.manifest
 
 BUNDLE_MIMETYPE = b'application/x-krita-resourcebundle'
 RESOURCE_DIR_NAMES = ["brushes",
@@ -75,8 +76,8 @@ ZIP_OPTIONS = {
 class Bundle:
     def __init__(self, path):
         self.root = path
-        manifest_path = self.__external_path(manifest.MANIFEST_PATH)
-        self.manifest = manifest.Manifest(manifest_path)
+        manifest_path = self.__external_path(kbundle.manifest.MANIFEST_PATH)
+        self.manifest = kbundle.manifest.Manifest(manifest_path)
         self.resources = []
 
     def load(self):
@@ -193,7 +194,7 @@ class Bundle:
                 zip_add_file(ipath)
 
             zip_add_file("preview.png")
-            zip_add_file(manifest.MANIFEST_PATH)
+            zip_add_file(kbundle.manifest.MANIFEST_PATH)
             zip_add_file("meta.xml")
 
         return True
@@ -219,10 +220,10 @@ class Bundle:
 
         ipath = self.__internal_path(xpath)
 
-        return manifest.ManifestEntry(full_path  = ipath,
-                                      media_type = topmost_dir_name(ipath),
-                                      md5sum     = md5sum(xpath),
-                                      tags       = [])
+        return kbundle.manifest.ManifestEntry(full_path  = ipath,
+                                              media_type = topmost_dir_name(ipath),
+                                              md5sum     = md5sum(xpath),
+                                              tags       = [])
 
     def __insert_entry(self, ipath, info="INSERT"):
         print("{}: {}".format(info, ipath))
