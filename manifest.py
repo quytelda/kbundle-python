@@ -50,17 +50,20 @@ class ManifestEntry:
                           "\ttags: {}".format(tag_list)])
 
 class Manifest:
+    """A representation of a bundle manifest."""
 
     def __init__(self, manifestPath):
         self.path = manifestPath
         self.entries = {}
 
     def exists(self):
+        """Test whether the backing manifest XML file exists."""
         return os.path.isfile(self.path)
 
     def load(self):
-        doc = MD.parse(self.path)
+        """Read and parse the manifest XML file."""
 
+        doc = MD.parse(self.path)
         root = doc.documentElement
         if root.tagName != ELEM_MANIFEST or root.getAttribute(ATTR_VERSION) != "1.2":
             return False;
@@ -80,6 +83,8 @@ class Manifest:
         return True
 
     def save(self):
+        """Write this manifest to the manifest XML file."""
+
         # If the "META-INF" directory doesn't exists, create it.
         # The manifest file is created when written.
         (dir_path, _) = os.path.split(self.path)
@@ -89,17 +94,25 @@ class Manifest:
         doc = self.to_xml()
         output = doc.toprettyxml(indent=' ', encoding='UTF-8')
 
-        with open(self.path, "wb") as manifestFile:
-            manifestFile.write(output)
+        with open(self.path, "wb") as manifest_file:
+            manifest_file.write(output)
 
     def insert_entry(self, entry):
-        path = entry.full_path
-        if path in self.entries:
-            entry.tags += self.entries[path].tags
+        """Add a new ManifestEntry to the manifest."""
 
-        self.entries[path] = entry
+        # If an entry already exists for the provided path, replace
+        # it, but merge the old and new tag lists.
+        if entry.full_path in self.entries:
+            entry.tags += self.entries[entry.full_path].tags
+
+        self.entries[entry.full_path] = entry
 
     def remove_entry(self, path):
+        """Remove the entry with the given path from the manifest.
+
+        Returns False if the manifest doesn't contain an entry for the
+        given path, or True otherwise.
+        """
         if path not in self.entries:
             return False
 
@@ -107,9 +120,14 @@ class Manifest:
         return True
 
     def has_entry(self, path):
+        """Test if the manifest contains an entry for the given path."""
         return path in self.entries
 
     def compare_entries(self, entry_list):
+        """Given a list of paths, determine which overlap with
+        manifest entries, and which are present in only one list or
+        the other.
+        """
         entries_here  = set(self.entries.keys())
         entries_there = set(entry_list)
 
@@ -120,12 +138,21 @@ class Manifest:
         return (common, only_here, only_there)
 
     def tags(self, path):
+        """Return the list of tags for the resource at the given path.
+
+        If no entry exists for the given path, an empty list is returned.
+        """
         if not self.has_entry(path):
             return None
 
         return self.entries[path].tags
 
     def add_tag(self, path, tag):
+        """Apply a tag to the manifest entry with the given path.
+
+        Return False if there is no matching entry or the entry
+        already has the given tag.
+        """
         if not self.has_entry(path):
             return False
 
@@ -136,6 +163,11 @@ class Manifest:
         return True
 
     def remove_tag(self, path, tag):
+        """Remove a tag from the manifest entry with the given path.
+
+        Return False if there is no matching entry or the entry
+        doesn't have the given tag.
+        """
         if not self.has_entry(path):
             return False
 
@@ -146,6 +178,7 @@ class Manifest:
         return True
 
     def to_xml(self):
+        """Generate an XML document which describes the manifest."""
         doc = MD.getDOMImplementation().createDocument(MANIFEST_XMLNS, ELEM_MANIFEST, None)
 
         root = doc.documentElement
@@ -165,9 +198,11 @@ class Manifest:
         return doc
 
     def to_string(self):
+        """Generate a human-readable string representation of the manifest."""
         return '\n\n'.join([entry.to_string() for entry in self.entries.values()])
 
     def __tags_from_xml(self, e):
+        """Parse a list of tags from an appropriate XML DOM element."""
         tags = []
         for tags_elem in e.getElementsByTagName(ELEM_TAGS):
             for tag_elem in tags_elem.getElementsByTagName(ELEM_TAG):
@@ -176,6 +211,7 @@ class Manifest:
         return tags
 
     def __entry_from_xml(self, e):
+        """Parse a ManifestEntry from an equivalent XML DOM element."""
         if e.tagName != ELEM_FILE_ENTRY:
             return None
 
@@ -190,6 +226,7 @@ class Manifest:
         return entry
 
     def __tags_to_xml(self, doc, tags):
+        """Convert a list of tags into an equivalent XML DOM element."""
         tags_elem = doc.createElement(ELEM_TAGS)
 
         for tag in tags:
@@ -202,6 +239,7 @@ class Manifest:
         return tags_elem
 
     def __entry_to_xml(self, doc, entry):
+        """Convert a ManifestEntry into an equivalent XML DOM element."""
         entry_elem = doc.createElement(ELEM_FILE_ENTRY)
 
         # Resource paths in the manifest must use forward slash (/)
