@@ -59,7 +59,7 @@ def get_argument_parser():
     parser_list = subparsers.add_parser("list", help="list all entries in the manifest")
     parser_list.set_defaults(func=list)
 
-    parser_pack   = subparsers.add_parser("pack", help="zip a bundle tree into a bundle archive")
+    parser_pack = subparsers.add_parser("pack", help="zip a bundle tree into a bundle archive")
     parser_pack.set_defaults(func=pack)
     parser_pack.add_argument("path", help="output bundle file")
 
@@ -68,7 +68,7 @@ def get_argument_parser():
     parser_unpack.add_argument("path", help="input bundle file")
 
     parser_tag = subparsers.add_parser("tag", help="inspect or modify resource tags")
-    subparsers_tag = parser_tag.add_subparsers()
+    subparsers_tag = parser_tag.add_subparsers(required=True)
 
     parser_tag_ls = subparsers_tag.add_parser("ls", help="list tags")
     parser_tag_ls.set_defaults(func=tag_ls)
