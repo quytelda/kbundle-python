@@ -55,6 +55,17 @@ def list_recursively(dirname):
     return results
 
 def topmost_dir_name(path):
+    """Return the first (top-level) directory name in a path.
+
+    For example, `topmost_dir_name("foo/bar/baz")` returns `"foo"`.
+    Trailing slashes are not included except in the case of the root
+    directory ('/').
+    """
+
+    # For absolute paths, treat '/' as the root directory name.
+    if path.startswith("/"):
+        return "/"
+
     head = path
     tail = ""
 
