@@ -24,7 +24,10 @@ import pprint
 
 import kbundle.manifest
 
+# The mimetype string is written to the first entry of a bundle ZIP archive.
 BUNDLE_MIMETYPE = b'application/x-krita-resourcebundle'
+
+# These directories will be searched for resource files.
 RESOURCE_DIR_NAMES = ["brushes",
                       "gamutmasks",
                       "gradients",
@@ -35,9 +38,11 @@ RESOURCE_DIR_NAMES = ["brushes",
                       "workspaces"]
 
 def is_visible(filename):
+    """Test that a file is not a hidden dotfile."""
     return not filename.startswith('.')
 
 def list_recursively(dirname):
+    """Walk a directory tree and return a list of all files it contains."""
     results = []
     for current_dir, subdirs, files in os.walk(dirname):
         # Prune dotfiles
@@ -59,6 +64,7 @@ def topmost_dir_name(path):
     return tail
 
 def md5sum(path):
+    """Return the MD5 checksum of the file at the provided path."""
     alg = hashlib.md5()
     with open(path, "rb") as file:
         alg.update(file.read())
@@ -74,6 +80,8 @@ ZIP_OPTIONS = {
 }
 
 class Bundle:
+    """A class representing a Krita resource bundle."""
+
     def __init__(self, path):
         self.root = path
         manifest_path = self.__external_path(kbundle.manifest.MANIFEST_PATH)
@@ -112,6 +120,9 @@ class Bundle:
         if not self.resources:
             return False
 
+        # common contains resources present in the manifest and on-disk.
+        # mf_only contains resources listed only in the manifest.
+        # file_only contains resources present on-disk, but not in the manifest.
         common, mf_only, file_only = self.manifest.compare_entries(self.resources)
 
         # Remove resources that exist in the manifest but not on disk
@@ -200,9 +211,11 @@ class Bundle:
         return True
 
     def __external_path(self, ipath):
+        """Convert an internal path (relative to bundle root) to an external path. """
         return os.path.join(self.root, ipath)
 
     def __internal_path(self, path):
+        """Convert an external path to an internal path."""
         # Check whether the given path refers to a location inside the
         # bundle tree. If not, assume the path is relative to the
         # bundle root instead of the current directory (i.e. the path
@@ -214,6 +227,7 @@ class Bundle:
         return path if relative else os.path.relpath(abs_path, start=self.root)
 
     def __generate_entry(self, xpath):
+        """Generate a manifest entry for a bundle resource."""
         if not os.path.isfile(xpath):
             print("Not a resource file: {}".format(xpath), file=sys.stderr)
             return None
